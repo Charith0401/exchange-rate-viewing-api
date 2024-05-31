@@ -14,7 +14,8 @@ def viewAllRates(request):
 
         #to get distinct values ordering valueslist and distinct is needed based on which field needs to be distinct
         #when flat is true, tuples are eliminated so [[1],[2]] would become [1,2]
-        rates=Rates.objects.order_by().distinct("quote_currency").values()
+        #THERE IS AN ISSUE WHERE THE LATEST EXCHANGE RATE HAS TO BE DISPLAYED NOT JUST RANDOMLY GETTING DISTINCT RECORDS
+        rates=Rates.objects.order_by().distinct("quote_currency").aggregate(Max("exchange_rate")).values()
 
         # date=datetime.date(2024,5,29)
         # rates=Rates(date=date,quote_currency="JPY",exchange_rate=101.3)
