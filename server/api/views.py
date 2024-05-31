@@ -16,10 +16,10 @@ def viewAllRates(request):
         #when flat is true, tuples are eliminated so [[1],[2]] would become [1,2]
         rates=Rates.objects.order_by().distinct("quote_currency").values()
 
-        # date=datetime.date(2024,5,28)
-        # rates=Rates(date=date,quote_currency="LKR",exchange_rate=298.3)
+        # date=datetime.date(2024,5,29)
+        # rates=Rates(date=date,quote_currency="JPY",exchange_rate=101.3)
         # rates.save()
-        print(rates)
+        # print(rates)
         
         # serializedRates=serializers.serialize("json",rates)
         # print(serializedRates)
@@ -41,6 +41,7 @@ def viewHistoricalRates(request,quoteCurrency):
         historicalRates=Rates.objects.filter(date__gt=date).filter(quote_currency=formattedQuoteCurrency).values() 
 
         print(historicalRates)
+        
         #serializing data to convert from queryset to json and parsing the string object to an object to be displayed
         return JsonResponse(list(historicalRates),safe=False)
 
