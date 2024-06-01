@@ -3,7 +3,7 @@ from django.http import JsonResponse,HttpResponse
 from rest_framework.decorators import api_view
 from django.middleware.csrf import get_token
 from django.core import serializers
-from django.db.models import Max
+from django.db.models import Max,OuterRef,Subquery,F
 import json
 from api.models import Rates
 import datetime
@@ -14,17 +14,27 @@ def viewAllRates(request):
 
         #to get distinct values ordering valueslist and distinct is needed based on which field needs to be distinct
         #when flat is true, tuples are eliminated so [[1],[2]] would become [1,2]
-        #THERE IS AN ISSUE WHERE THE LATEST EXCHANGE RATE HAS TO BE DISPLAYED NOT JUST RANDOMLY GETTING DISTINCT RECORDS
-        rates=Rates.objects.order_by().distinct("quote_currency").aggregate(Max("exchange_rate")).values()
 
+        #aggregate() will return a single dictionary value but distinct() will return a queryset and so aggregate and distinct isnt allowed
+        # rates=Rates.objects.order_by().distinct("quote_currency").aggregate(Max("date")).values() 
+        #.values does grouping
+
+        # rates=Rates.objects.filter(date=OuterRef("date")).values("date").annotate(latest_date=Max("date")).values('latest_date')
+        # subquery=Subquery(rates) #once this is run a single column is returned and in this case it is max_rate
+        # result = Rates.objects.filter(date=subquery).values()
+        # print("check this",list(result)) #returns an instance of a subquery object and next you have to filter it.
+
+        result=Rates.objects.values("quote_currency").annotate(max_rate=Max("exchange_rate")).filter(exchange_rate=F("max_rate")).values()
+
+        # final_query=Rates.objects.filter(quote_currency=subquery)
+        # print("and this",final_query)
         # date=datetime.date(2024,5,29)
         # rates=Rates(date=date,quote_currency="JPY",exchange_rate=101.3)
         # rates.save()
         # print(rates)
         
-        # serializedRates=serializers.serialize("json",rates)
-        # print(serializedRates)
-        return JsonResponse(list(rates),safe=False)
+        # return JsonResponse(list(rates),safe=False)
+        return JsonResponse(list(result),safe=False)
     
 @api_view(["GET"])
 def viewHistoricalRates(request,quoteCurrency):
@@ -60,3 +70,11 @@ def currentExchangeRate(request,quoteCurrency):
         latestRate=Rates.objects.filter(date=latestDate.get("date__max")).filter(quote_currency=formattedQuoteCurrency).values()
    
         return JsonResponse(list(latestRate),safe=False)
+    
+
+
+# subquery = Rates.objects.filter(
+#     quote_currency=OuterRef('quote_currency')
+# ).values('quote_currency').annotate(max_rate=Max('rate')).values('max_rate')[:1]
+#if we take a query like this, the OuterRef is referencing the quote_currency after the annotate and values operations have been applied to the initial
+#query
