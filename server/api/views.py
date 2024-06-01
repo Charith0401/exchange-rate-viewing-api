@@ -17,7 +17,7 @@ def viewAllRates(request):
 
         #aggregate() will return a single dictionary value but distinct() will return a queryset and so aggregate and distinct isnt allowed
         # rates=Rates.objects.order_by().distinct("quote_currency").aggregate(Max("date")).values() 
-        #.values does grouping
+        #.values does grouping if it is combined with .annotation()
         #
 
         rates=Rates.objects.filter(quote_currency=OuterRef("quote_currency")).order_by("-date").annotate(latest_date=Max("date")).values("latest_date")[:1]
