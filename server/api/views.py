@@ -18,13 +18,14 @@ def viewAllRates(request):
         #aggregate() will return a single dictionary value but distinct() will return a queryset and so aggregate and distinct isnt allowed
         # rates=Rates.objects.order_by().distinct("quote_currency").aggregate(Max("date")).values() 
         #.values does grouping
+        #
 
-        # rates=Rates.objects.filter(date=OuterRef("date")).values("date").annotate(latest_date=Max("date")).values('latest_date')
-        # subquery=Subquery(rates) #once this is run a single column is returned and in this case it is max_rate
-        # result = Rates.objects.filter(date=subquery).values()
-        # print("check this",list(result)) #returns an instance of a subquery object and next you have to filter it.
+        rates=Rates.objects.filter(quote_currency=OuterRef("quote_currency")).order_by("-date").annotate(latest_date=Max("date")).values("latest_date")[:1]
+        # rates=Rates.objects.filter(quote_currency=OuterRef("quote_currency")).annotate(latest_date=Max("date")).values("latest_date")[:1]
+        subquery=Subquery(rates)
 
-        result=Rates.objects.values("quote_currency").annotate(max_rate=Max("exchange_rate")).filter(exchange_rate=F("max_rate")).values()
+        result=Rates.objects.filter(date=subquery).values()
+  
 
         # final_query=Rates.objects.filter(quote_currency=subquery)
         # print("and this",final_query)
@@ -33,7 +34,6 @@ def viewAllRates(request):
         # rates.save()
         # print(rates)
         
-        # return JsonResponse(list(rates),safe=False)
         return JsonResponse(list(result),safe=False)
     
 @api_view(["GET"])
