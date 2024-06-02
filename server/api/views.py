@@ -1,13 +1,15 @@
 from django.shortcuts import render
-from django.http import JsonResponse,HttpResponse
+from django.http import JsonResponse
 from rest_framework.decorators import api_view
 from django.middleware.csrf import get_token
-from django.core import serializers
-from django.db.models import Max,OuterRef,Subquery,F
-import json
+from django.db.models import Max,OuterRef,Subquery
 from api.models import Rates
 import datetime
+from drf_spectacular.utils import extend_schema, OpenApiParameter
+from drf_spectacular.types import OpenApiTypes
+from .serializers import RateSerializer
 
+@extend_schema(responses=RateSerializer)
 @api_view(["GET"])
 def viewAllRates(request):
     if (request.method=="GET"):
@@ -35,7 +37,8 @@ def viewAllRates(request):
         # print(rates)
         
         return JsonResponse(list(result),safe=False)
-    
+
+@extend_schema(parameters=[OpenApiParameter("quoteCurrency",OpenApiTypes.STR,OpenApiParameter.PATH)],responses=RateSerializer)
 @api_view(["GET"])
 def viewHistoricalRates(request,quoteCurrency):
     if (request.method=="GET"):
@@ -56,6 +59,7 @@ def viewHistoricalRates(request,quoteCurrency):
         #serializing data to convert from queryset to json and parsing the string object to an object to be displayed
         return JsonResponse(list(historicalRates),safe=False)
 
+@extend_schema(parameters=[OpenApiParameter("quoteCurrency",OpenApiTypes.STR,OpenApiParameter.PATH)],responses=RateSerializer)
 @api_view(["GET"])
 def currentExchangeRate(request,quoteCurrency):
     if (request.method=="GET"):
