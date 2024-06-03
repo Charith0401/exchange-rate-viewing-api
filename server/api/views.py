@@ -27,14 +27,6 @@ def viewAllRates(request):
         subquery=Subquery(rates)
 
         result=Rates.objects.filter(date=subquery).values()
-  
-
-        # final_query=Rates.objects.filter(quote_currency=subquery)
-        # print("and this",final_query)
-        # date=datetime.date(2024,5,29)
-        # rates=Rates(date=date,quote_currency="JPY",exchange_rate=101.3)
-        # rates.save()
-        # print(rates)
         
         return JsonResponse(list(result),safe=False)
 
@@ -81,5 +73,5 @@ def currentExchangeRate(request,quoteCurrency):
 # subquery = Rates.objects.filter(
 #     quote_currency=OuterRef('quote_currency')
 # ).values('quote_currency').annotate(max_rate=Max('rate')).values('max_rate')[:1]
-#if we take a query like this, the OuterRef is referencing the quote_currency after the annotate and values operations have been applied to the initial
+#the OuterRef is referencing the quote_currency after the annotate and values operations have been applied to the initial
 #query
