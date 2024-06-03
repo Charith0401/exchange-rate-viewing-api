@@ -21,7 +21,7 @@ def viewAllRates(request):
         # rates=Rates.objects.order_by().distinct("quote_currency").aggregate(Max("date")).values() 
         #.values does grouping if it is combined with .annotation()
         #
-
+        
         rates=Rates.objects.filter(quote_currency=OuterRef("quote_currency")).order_by("-date").annotate(latest_date=Max("date")).values("latest_date")[:1]
         # rates=Rates.objects.filter(quote_currency=OuterRef("quote_currency")).annotate(latest_date=Max("date")).values("latest_date")[:1]
         subquery=Subquery(rates)
