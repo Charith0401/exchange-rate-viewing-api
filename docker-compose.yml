@@ -19,6 +19,8 @@ services:
       POSTGRES_PASSWORD: user
     volumes:
       - pgdata:/var/lib/postgresql/data/
+      - ./database_backup:/docker-entrypoint-initdb.d
+    # command: ["/bin/bash", "-c", "psql -U postgres -d postgres < postgres.sql"]
     ports:
       - "5432:5432"
 volumes:
