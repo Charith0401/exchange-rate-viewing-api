@@ -325,18 +325,18 @@ ALTER TABLE public.django_session OWNER TO postgres;
 --
 
 COPY public.api_rates (id, date, base_currency, quote_currency, exchange_rate) FROM stdin;
-13	2024-01-06	USD	LKR	300.1
-14	2024-03-06	USD	LKR	286.1
-15	2024-02-06	USD	EUR	1.0
-16	2024-02-06	USD	GBP	0.8
-17	2024-01-05	USD	GBP	0.6
-18	2024-02-06	USD	JPY	130.5
-19	2024-02-06	USD	AUD	1.5
-20	2024-02-06	USD	CHF	1.0
-21	2024-02-06	USD	CNY	6.8
-22	2024-02-06	USD	INR	82.3
-23	2024-02-06	USD	CAD	1.3
-24	2024-02-06	USD	SGD	1.4
+25	2024-01-06	USD	LKR	300.1
+26	2024-01-06	USD	LKR	286.1
+27	2024-02-06	USD	EUR	1.0
+28	2024-02-06	USD	GBP	0.8
+29	2024-01-05	USD	GBP	0.6
+30	2024-02-06	USD	JPY	130.5
+31	2024-02-06	USD	AUD	1.5
+32	2024-02-06	USD	CHF	1.0
+33	2024-02-06	USD	CNY	6.8
+34	2024-02-06	USD	INR	82.3
+35	2024-02-06	USD	CAD	1.3
+36	2024-02-06	USD	SGD	1.4
 \.
 
 
@@ -479,7 +479,7 @@ COPY public.django_session (session_key, session_data, expire_date) FROM stdin;
 -- Name: api_rates_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.api_rates_id_seq', 24, true);
+SELECT pg_catalog.setval('public.api_rates_id_seq', 36, true);
 
 
 --
