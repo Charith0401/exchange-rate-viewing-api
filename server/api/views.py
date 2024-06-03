@@ -50,7 +50,7 @@ def viewHistoricalRates(request,quoteCurrency):
         date=datetime.datetime.now()-datetime.timedelta(days=30)
 
         #using __greaterthan to filter dates greater than the date that was calculated 30 days ago
-        #you can import "Q" from django models and this basically allows you to do OR operations
+        #you can import "Q" from django models and this basically allows u to have multiple conditions
         #at the end of the operation add .values() so that the model instances arent includes which means no metadata included in result
         # historicalRates=Rates.objects.filter(date__gt=date).filter(quote_currency=formattedQuoteCurrency).values() 
         historicalRates=Rates.objects.filter(date__lt=date).filter(quote_currency=formattedQuoteCurrency).values() 
