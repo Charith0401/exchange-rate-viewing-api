@@ -6,5 +6,10 @@ from api.models import Rates
 
 class RateSerializer(serializers.ModelSerializer):
     class Meta:
-        model=Rates
-        fields=["date","base_currency","quote_currency","exchange_rate"]
+        model = Rates
+        fields = '__all__'
+
+# class RateSerializer(serializers.ModelSerializer):
+#     class Meta:
+#         model = Rates
+#         fields = '__all__'

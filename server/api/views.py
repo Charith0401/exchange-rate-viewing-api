@@ -1,6 +1,8 @@
 from django.shortcuts import render
 from django.http import JsonResponse
 from rest_framework.decorators import api_view
+from rest_framework.response import Response
+from rest_framework import status
 from django.middleware.csrf import get_token
 from django.db.models import Max,OuterRef,Subquery
 from api.models import Rates
@@ -9,28 +11,36 @@ from drf_spectacular.utils import extend_schema, OpenApiParameter
 from drf_spectacular.types import OpenApiTypes
 from .serializers import RateSerializer
 
+def process_string(a: str):
+     """
+        mypy
+     """
+
+     pass
+
+process_string(1)
+
 @extend_schema(responses=RateSerializer)
 @api_view(["GET"])
-def viewAllRates(request):
-    if (request.method=="GET"):
-
-        #to get distinct values ordering valueslist and distinct is needed based on which field needs to be distinct
-        #when flat is true, tuples are eliminated so [[1],[2]] would become [1,2]
-
-        #aggregate() will return a single dictionary value but distinct() will return a queryset and so aggregate and distinct isnt allowed
-        # rates=Rates.objects.order_by().distinct("quote_currency").aggregate(Max("date")).values() 
-        #.values does grouping if it is combined with .annotation()
-        #
+def view_all_rates(request):
+        """
+            Return all exchange rates
+        """
         
-        rates=Rates.objects.filter(quote_currency=OuterRef("quote_currency")).order_by("-date").annotate(latest_date=Max("date")).values("latest_date")[:1]
-        # rates=Rates.objects.filter(quote_currency=OuterRef("quote_currency")).annotate(latest_date=Max("date")).values("latest_date")[:1]
-        subquery=Subquery(rates)
+        rates = Rates.objects.filter(quote_currency=OuterRef("quote_currency")).order_by('-date').values("date")[:1]
+        rates_subquery = Subquery(rates)
+        rates_final = Rates.objects.filter(date=rates_subquery).values()
 
-        result=Rates.objects.filter(date=subquery).values()
+        serializer = RateSerializer(instance=rates_final, many=True)
+
+        print("rates",serializer.data)
         
-        return JsonResponse(list(result),safe=False)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
-@extend_schema(parameters=[OpenApiParameter("quoteCurrency",OpenApiTypes.STR,OpenApiParameter.PATH)],responses=RateSerializer)
+
+@extend_schema(parameters=[OpenApiParameter("quoteCurrency",
+    OpenApiTypes.STR,OpenApiParameter.PATH)],
+    responses=RateSerializer)
 @api_view(["GET"])
 def viewHistoricalRates(request,quoteCurrency):
     if (request.method=="GET"):
